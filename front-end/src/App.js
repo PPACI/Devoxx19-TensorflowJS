@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
+import * as tf from "@tensorflow/tfjs";
 
 const styles = {
     root: {
@@ -29,10 +30,16 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            imageUrl: null
+            imageUrl: 'https://dvxfrance.cdn.prismic.io/dvxfrance/f4989a9f149ab92da707fb3acb7b2dbf0ee33a3d_logo-texte-devoxx-france-2-lignes-400.png'
         };
 
         this.handleFileChange = this.handleFileChange.bind(this);
+        this.predict = this.predict.bind(this);
+    }
+
+    predict(image){
+        // Actual prediction
+        tf.browser.fromPixels(image).print()
     }
 
     handleFileChange(e) {
@@ -41,9 +48,18 @@ class App extends Component {
         let file = e.target.files[0];
 
         reader.onloadend = () => {
+            // add preview
             this.setState({
                 imageUrl: reader.result
             });
+
+            // construct a new Image object for tf.js
+            let image = new Image();
+            image.onload = () =>{
+                this.predict(image)
+            };
+
+            image.src = reader.result;
         };
 
         reader.readAsDataURL(file)

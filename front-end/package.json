@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^3.9.2",
+    "@tensorflow/tfjs": "^0.15.3",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-scripts": "0.9.5"
