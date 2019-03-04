@@ -7,6 +7,8 @@ import Grid from "@material-ui/core/Grid";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
 import * as tf from "@tensorflow/tfjs";
+import modelDefinition from "../model/model.json"
+import "../model/group1-shard1of1"
 
 const styles = {
     root: {
@@ -37,7 +39,15 @@ class App extends Component {
         this.predict = this.predict.bind(this);
     }
 
-    predict(image){
+    componentDidMount() {
+        tf.loadModel(modelDefinition)
+            .then(model => {
+                console.log(model)
+            })
+            .catch(err => console.log(err))
+    }
+
+    predict(image) {
         // Actual prediction
         tf.browser.fromPixels(image).print()
     }
@@ -55,7 +65,7 @@ class App extends Component {
 
             // construct a new Image object for tf.js
             let image = new Image();
-            image.onload = () =>{
+            image.onload = () => {
                 this.predict(image)
             };
 
