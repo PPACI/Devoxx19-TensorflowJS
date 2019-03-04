@@ -1,24 +1,19 @@
-.App {
-  text-align: center;
+:local(.container) {
+    position: relative;
+    max-height: 500px;
+    overflow: hidden;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+:local(.image) {
+    width: 100%;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+:local(.fab) {
+    position: absolute!important;
+    bottom: 20px;
+    right: 20px;
 }
 
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+:local(.fileInput) {
+    display: none;
 }
