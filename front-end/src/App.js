@@ -1,131 +1,102 @@
-import React, {Component} from 'react';
-import './App.css';
-import {withStyles} from "@material-ui/core";
-import AppBar from "@material-ui/core/AppBar";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Paper from "@material-ui/core/Paper";
+import React, {useEffect, useRef, useState} from 'react';
+import {AppBar, CssBaseline, Grid, Paper, Toolbar, Typography} from '@material-ui/core';
+import {Edit} from '@material-ui/icons'
 import * as tf from "@tensorflow/tfjs";
-
-const styles = {
-    root: {
-        flexGrow: 1,
-    },
-    demo: {
-        height: '800px'
-    },
-    paper: {
-        width: '300px',
-        height: '300px'
-    },
-    imageInput: {
-        maxWidth: "300px",
-        maxHeight: "270px"
-    }
-};
+import Fab from "@material-ui/core/es/Fab/Fab";
+import styles from "./App.css";
 
 
-class App extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            model: null,
-            results: null,
-            imageUrl: 'https://dvxfrance.cdn.prismic.io/dvxfrance/f4989a9f149ab92da707fb3acb7b2dbf0ee33a3d_logo-texte-devoxx-france-2-lignes-400.png'
-        };
+export default function App() {
+    const [model, setModel] = useState(null);
+    const [results, setResults] = useState(null);
+    const [image, setImage] = useState(`${process.env.PUBLIC_URL}devoxx.png`);
+    const fileInputEl = useRef(null);
 
-        this.handleFileChange = this.handleFileChange.bind(this);
-        this.predict = this.predict.bind(this);
-    }
+    const loadModel = async () => {
+        try {
+            setModel(await tf.loadLayersModel(`${process.env.PUBLIC_URL}/model/model.json`));
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-    componentDidMount() {
-        console.log(process.env.PUBLIC_URL + '/model/model.json');
-        tf.loadLayersModel(process.env.PUBLIC_URL + '/model/model.json')
-            .then(model => {
-                console.log(model);
-                this.setState({model})
-            })
-            .catch(err => console.log(err))
-    }
+    useEffect(() => {
+        loadModel();
+    }, []);
 
-    predict(image) {
+    const predict = async image => {
         // Actual prediction
         const input = tf.browser.fromPixels(image)
             .resizeBilinear([224, 224])
             .expandDims(0);
         input.print();
-        const prediction = this.state.model.predict(input);
-        prediction.data().then(results => {
-            console.log(results);
-            if (results[0] > 0.5) console.log("it's a croissant");
-            else console.log("It's a pain au chocolat");
-            this.setState({results})
-        })
-    }
+        const prediction = model.predict(input);
+        setResults(await prediction.data());
+    };
 
-    handleFileChange(e) {
+    const handleFileChange = e => {
         e.preventDefault();
-        let reader = new FileReader();
-        let file = e.target.files[0];
+        const reader = new FileReader();
+        const file = e.target.files[0];
 
         reader.onloadend = () => {
             // add preview
-            this.setState({
-                imageUrl: reader.result
-            });
+            setImage(reader.result);
 
             // construct a new Image object for tf.js
-            let image = new Image();
+            const image = new Image();
             image.onload = () => {
-                this.predict(image)
+                predict(image)
             };
 
             image.src = reader.result;
         };
 
         reader.readAsDataURL(file)
-    }
+    };
 
-    render() {
-        const {classes} = this.props;
+    const chooseFile = () => {
+        fileInputEl.current.click();
+    };
 
-        let result;
-        if (this.state.results === null){
-            result = 'Prediction'
-        }
-        else if (this.state.results[0] > 0.5) {
-            result = `Croissant : ${this.state.results[0]}`
+
+    const resultsDescription = () => {
+        if (results === null){
+            return 'Prediction'
+        } else if (results[0] > 0.5) {
+            return `Croissant : ${results[0]}`
         } else {
-            result = `Pain au chocolat : ${this.state.results[1]}`
+            return `Pain au chocolat : ${results[1]}`
         }
+    };
 
-        return (
-            <React.Fragment>
-                <CssBaseline/>
-                <div className={classes.root}>
-                    <AppBar position="static">
-                        <Typography variant="h2" color="inherit">
+
+    return (
+        <>
+            <CssBaseline/>
+            <div className="root">
+                <AppBar position="static">
+                    <Toolbar>
+                        <Typography variant="h6" color="inherit">
                             Devoxx - Croissant
                         </Typography>
-                    </AppBar>
-                    <Grid container className={classes.demo} justify="space-evenly" alignItems="center">
-                        <Grid item xs={6}>
-                            <Paper className={classes.paper}>
-                                <img src={this.state.imageUrl} alt="input" className={classes.imageInput}/>
-                                <input type="file" onChange={this.handleFileChange}/>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Paper className={classes.paper}>
-                                {result}
-                            </Paper>
-                        </Grid>
+                    </Toolbar>
+                </AppBar>
+                <Grid container justify="space-evenly" alignItems="center" >
+                    <Grid item xs={12} sm={10} md={8} lg={6}>
+                        <Paper className={styles.root}>
+                            <div className={styles.container}>
+                                <img src={image} alt="input" className={styles.image}/>
+                                <Fab color="primary" aria-label="Edit" className={styles.fab} onClick={chooseFile}>
+                                    <Edit />
+                                </Fab>
+                            </div>
+                            <input type="file" id="file" ref={fileInputEl} className={styles.fileInput} onChange={handleFileChange}/>
+                            {resultsDescription()}
+                        </Paper>
                     </Grid>
-                </div>
-            </React.Fragment>
-        );
-    }
+                </Grid>
+            </div>
+        </>
+    );
 }
-
-export default withStyles(styles)(App);
