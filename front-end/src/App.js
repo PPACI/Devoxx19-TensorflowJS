@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {AppBar, CssBaseline, Grid, Paper, Toolbar, Typography} from '@material-ui/core';
-import {Edit} from '@material-ui/icons'
+import {CloudUpload} from '@material-ui/icons'
 import * as tf from "@tensorflow/tfjs";
 import Fab from "@material-ui/core/es/Fab/Fab";
 import styles from "./App.css";
@@ -88,7 +88,7 @@ export default function App() {
                             <div className={styles.container}>
                                 <img src={image} alt="input" className={styles.image}/>
                                 <Fab color="primary" aria-label="Edit" className={styles.fab} onClick={chooseFile}>
-                                    <Edit />
+                                    <CloudUpload />
                                 </Fab>
                             </div>
                             <input type="file" id="file" ref={fileInputEl} className={styles.fileInput} onChange={handleFileChange}/>
