@@ -11,8 +11,7 @@ croissant.thumbnail((224, 224))
 croissant = croissant.resize((224, 224))
 croissant.show()
 
-
-croissant_np = numpy.expand_dims(numpy.array(croissant.convert('RGB')), 0)
+croissant_np = numpy.expand_dims(numpy.array(croissant.convert('RGB')), 0) / 255
 
 model = load_model('croissant_185.hdf5')
 

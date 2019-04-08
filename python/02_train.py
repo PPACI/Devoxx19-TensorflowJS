@@ -7,7 +7,6 @@ from tensorflow.python.keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.python.keras.optimizers import Adam
 from tensorflow.python.keras.callbacks import *
 
-
 # Create image data generator
 image_generator = ImageDataGenerator(
     validation_split=0.15,
@@ -15,7 +14,8 @@ image_generator = ImageDataGenerator(
     zoom_range=0.1,
     width_shift_range=0.1,
     height_shift_range=0.1,
-    rotation_range=5
+    rotation_range=5,
+    rescale=1. / 255
 )
 train_generator = image_generator.flow_from_directory("dataset", subset="training", target_size=(224, 224),
                                                       batch_size=8)
@@ -23,11 +23,11 @@ validation_generator = image_generator.flow_from_directory("dataset", subset="va
                                                            batch_size=8)
 
 # Show an image from train set
-Image.fromarray(next(train_generator)[0][0].astype(numpy.uint8)).show()
+Image.fromarray((next(train_generator)[0][0] * 255).astype(numpy.uint8)).show()
 
 # Create model
 mobile = MobileNet(
-    input_shape=(224,224,3),
+    input_shape=(224, 224, 3),
     include_top=False,
     weights='imagenet',
     pooling='avg',
