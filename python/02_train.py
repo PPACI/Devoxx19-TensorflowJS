@@ -51,7 +51,7 @@ callbacks = [
         min_lr=1e-5
     ),
     ModelCheckpoint(
-        filepath="croissant_185.hdf5",
+        filepath="croissant.hdf5",
         verbose=1,
         save_best_only=True
     )
