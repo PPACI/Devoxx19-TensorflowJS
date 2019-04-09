@@ -31,23 +31,27 @@ export default function App() {
 
     async function predict(event, model) {
         const { target } = event
-        console.log(target)
         // Actual prediction
         const input = tf.browser.fromPixels(target)
             .resizeBilinear([224, 224])
-            .expandDims(0);
-        input.print();
+            .expandDims(0)
+            .toFloat()
+            .div(tf.scalar(255));
+        // input.print();
         const prediction = model.predict(input);
         setResults(await prediction.data());
     };
 
-    const resultsDescription = () => {
+    function resultsDescription(){
+        console.log(results)
         if (results === null) {
             return 'Prediction'
         } else if (results[0] > 0.5) {
             return `Croissant : ${results[0]}`
-        } else {
+        } else if (results[1] > 0.5) {
             return `Pain au chocolat : ${results[1]}`
+        } else {
+            return '-'
         }
     };
 
