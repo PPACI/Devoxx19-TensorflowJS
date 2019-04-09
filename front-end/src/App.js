@@ -28,7 +28,9 @@ export default function App() {
         // Actual prediction
         const input = tf.browser.fromPixels(image)
             .resizeBilinear([224, 224])
-            .expandDims(0);
+            .expandDims(0)
+            .toFloat()
+            .div(tf.scalar(255));
         input.print();
         const prediction = model.predict(input);
         setResults(await prediction.data());
@@ -65,8 +67,10 @@ export default function App() {
             return 'Prediction'
         } else if (results[0] > 0.5) {
             return `Croissant : ${results[0]}`
-        } else {
+        } else if (results[1] > 0.5) {
             return `Pain au chocolat : ${results[1]}`
+        } else {
+            return '-'
         }
     };
 
