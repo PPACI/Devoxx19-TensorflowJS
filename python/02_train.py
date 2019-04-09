@@ -35,7 +35,7 @@ mobile = MobileNet(
 )
 output = Dropout(0.4)(mobile.output)
 output = Dense(8, activation="relu")(output)
-output = Dense(2, activation="sigmoid")(output)
+output = Dense(3, activation="sigmoid")(output)
 
 model = Model(inputs=mobile.input, outputs=output)
 model.summary()
