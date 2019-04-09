@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AppBar, CssBaseline, Grid, Paper, Toolbar, Typography } from '@material-ui/core';
+import { Bar } from 'react-chartjs-2';
 import { CloudUpload } from '@material-ui/icons'
 import * as tf from "@tensorflow/tfjs";
 import Fab from "@material-ui/core/es/Fab/Fab";
@@ -7,7 +8,7 @@ import styles from "./App.css";
 
 
 export default function App() {
-    const [results, setResults] = useState(null);
+    const [results, setResults] = useState([0, 0]);
     const [image, setImage] = useState(`${process.env.PUBLIC_URL}devoxx.png`);
     const webcamEl = useRef(null);
 
@@ -39,19 +40,29 @@ export default function App() {
             .div(tf.scalar(255));
         // input.print();
         const prediction = model.predict(input);
-        setResults(await prediction.data());
+        const rawResults = await prediction.data()
+        setResults(rawResults.slice(0, 2));
     };
 
-    function resultsDescription(){
-        console.log(results)
-        if (results === null) {
-            return 'Prediction'
-        } else if (results[0] > 0.5) {
-            return `Croissant : ${results[0]}`
-        } else if (results[1] > 0.5) {
-            return `Pain au chocolat : ${results[1]}`
-        } else {
-            return '-'
+    function chartData() {
+        return {
+            labels: ['croissant', 'paint au chocolat'],
+            datasets: [{
+                label: 'classification',
+                data: results
+            }]
+        }
+    };
+
+    const chartOptions= {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    max: 1,
+                    min: 0,
+                    stepSize: 0.2
+                }
+            }]
         }
     };
 
@@ -77,7 +88,7 @@ export default function App() {
                                     </div>
                                 </Grid>
                             </Grid>
-                            {resultsDescription()}
+                            <Bar data={chartData()} width={300} options={chartOptions}/>
                         </Paper>
                     </Grid>
                 </Grid>
