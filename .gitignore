@@ -108,3 +108,5 @@ dataset
 # IntelliJ
 .idea/
 *.iml
+
+.vscode
